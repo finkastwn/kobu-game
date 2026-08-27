@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Kartu Kobu</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div id="lobby">
+        <h1 class="logo">KOBU</h1>
+        <p class="subtitle">KOmpatibel BUat Anak Sholeh</p>
+        <div class="lobby-box">
+            <input type="text" id="playerName" placeholder="Masukkan Nama Kamu..." autocomplete="off">
+            <div class="lobby-buttons">
+                <button onclick="joinGame()" class="btn btn-primary">Masuk Room</button>
+                <button onclick="startGame()" class="btn btn-success">Mulai Game</button>
+            </div>
+            <h3>Pemain Di Lobby (<span id="playerCount">0</span>/6):</h3>
+            <ul id="playerList"></ul>
+        </div>
+    </div>
+
+    <div id="gameBoard" class="hidden">
+        <!-- Top Status Bar -->
+        <div class="top-bar">
+            <div id="timerNotice" class="badge badge-warning">
+                ⏱️ Fase Intip Kartu: <strong id="countdownSec">10</strong>s
+            </div>
+            <div id="turnNotice" class="badge badge-info hidden">
+                Giliran: <strong id="currentTurnName">-</strong>
+            </div>
+        </div>
+
+        <!-- Banner Papan Skor Game Over (Tidak Memblokir Kartu) -->
+        <div id="gameOverModal" class="score-banner hidden">
+            <h2 id="kobuCallerText">KOBU!</h2>
+            <div id="scoreBoard"></div>
+            <button onclick="location.reload()" class="btn btn-primary" style="margin-top:10px;">Main Lagi</button>
+        </div>
+
+        <!-- Zone 1: Pemain Lain -->
+        <div id="otherPlayers"></div>
+
+        <!-- Zone 2: Area Meja Tengah (Dek & Buangan) -->
+        <div class="table-center">
+            <div class="deck-container">
+                <div id="drawDeck" class="card back" onclick="drawFromDeck()">
+                </div>
+                <small class="deck-count">Sisa: <strong id="deckCount">0</strong></small>
+            </div>
+
+            <div class="deck-container">
+                <div id="discardPile" class="card empty" onclick="drawFromDiscard()">
+                </div>
+                <small class="deck-count"></small>
+            </div>
+        </div>
+
+        <!-- Zone 3: Kartu yang Baru Diambil -->
+        <div id="heldCardArea" class="held-zone hidden">
+            <h4>Kartu yang Diambil:</h4>
+            <div class="held-card-wrapper">
+                <div id="heldCard" class="card"></div>
+                <button id="discardBtn" onclick="discardHeldCard()" class="btn btn-danger">Langsung Buang</button>
+            </div>
+            <p class="hint">Klik kartu di bawah untuk <strong>MENUKAR</strong>, atau tombol di atas untuk membuang.</p>
+        </div>
+
+        <!-- Zone 4: Kartu Milik Sendiri & Tombol Kobu Bawah -->
+        <div id="myHandContainer" class="my-zone">
+            <div class="my-hand-header">
+                <h3>Kartu Kamu (Terbuka Saat Game Over):</h3>
+                <button id="kobuBtn" class="hidden" onclick="callKobu()">⚡ KOBU!</button>
+            </div>
+            <div id="myHand" class="hand-grid"></div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
