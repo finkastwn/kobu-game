@@ -1,4 +1,6 @@
-// PROTEKSI DEVTOOLS & INSPECT ELEMENT
+// ==========================================
+// ANTI-INSPECT ELEMENT & DEVTOOLS PROTECTIONS
+// ==========================================
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('keydown', (e) => {
     if (
@@ -24,8 +26,11 @@ setInterval(() => {
     }
 }, 1000);
 
-// GAME LOGIC
+// ==========================================
+// GAME CLIENT LOGIC
+// ==========================================
 const socket = io();
+
 let isPeekingPhase = false;
 let myCardCount = 0;
 let hasPeekedCard = false;
@@ -33,19 +38,28 @@ let myHeldCard = null;
 let currentTurnPlayerId = null;
 let isGameOver = false;
 let timerInterval = null;
-let hasJoined = false;
+let isJoined = false;
 
 function joinGame() {
-    if (hasJoined) return;
+    if (isJoined) return;
+
     const nameInput = document.getElementById('playerName');
-    const name = nameInput.value.trim();
-    if (name) {
-        socket.emit('joinRoom', name);
+    const name = nameInput ? nameInput.value.trim() : '';
+
+    if (!name) {
+        alert("Silakan masukkan nama kamu terlebih dahulu!");
+        return;
     }
+
+    socket.emit('joinRoom', name);
 }
 
 socket.on('joinSuccess', ({ name }) => {
-    hasJoined = true;
+    isJoined = true;
+
+    const nameInput = document.getElementById('playerName');
+    if (nameInput) nameInput.disabled = true;
+
     const joinBtn = document.querySelector('.lobby-buttons .btn-primary');
     if (joinBtn) {
         joinBtn.disabled = true;
@@ -53,8 +67,6 @@ socket.on('joinSuccess', ({ name }) => {
         joinBtn.style.opacity = "0.6";
         joinBtn.style.cursor = "not-allowed";
     }
-    const nameInput = document.getElementById('playerName');
-    if (nameInput) nameInput.disabled = true;
 });
 
 socket.on('joinError', (msg) => {
@@ -176,8 +188,9 @@ socket.on('actionComplete', () => {
 
 function renderMyHand(openHand = null) {
     const myHandDiv = document.getElementById('myHand');
-    myHandDiv.innerHTML = '';
+    if (!myHandDiv) return;
 
+    myHandDiv.innerHTML = '';
     const count = openHand ? openHand.length : myCardCount;
 
     for (let i = 0; i < count; i++) {
@@ -242,12 +255,14 @@ socket.on('gameOverEvent', ({ kobuCalledBy, scores, gameState }) => {
     document.getElementById('kobuCallerText').innerText = `KOBU dipanggil oleh ${kobuCalledBy}!`;
 
     const scoreBoard = document.getElementById('scoreBoard');
-    scoreBoard.innerHTML = scores.map((s, index) => `
-        <div class="score-row ${index === 0 ? 'winner' : ''}">
-            <span>${index === 0 ? '🏆 ' : ''}${s.name}</span>
-            <span>Total Poin: <strong>${s.totalPoints}</strong></span>
-        </div>
-    `).join('');
+    if (scoreBoard) {
+        scoreBoard.innerHTML = scores.map((s, index) => `
+            <div class="score-row ${index === 0 ? 'winner' : ''}">
+                <span>${index === 0 ? '🏆 ' : ''}${s.name}</span>
+                <span>Total Poin: <strong>${s.totalPoints}</strong></span>
+            </div>
+        `).join('');
+    }
 
     document.getElementById('gameOverModal').classList.remove('hidden');
     updateBoardState(gameState);
@@ -255,6 +270,7 @@ socket.on('gameOverEvent', ({ kobuCalledBy, scores, gameState }) => {
 
 function renderOtherPlayers(players, currentTurnId) {
     const container = document.getElementById('otherPlayers');
+    if (!container) return;
     container.innerHTML = '';
 
     players.forEach(p => {
@@ -280,17 +296,24 @@ function renderOtherPlayers(players, currentTurnId) {
 }
 
 function updateBoardState(state) {
-    document.getElementById('deckCount').innerText = state.deck;
+    const deckCountEl = document.getElementById('deckCount');
+    if (deckCountEl) deckCountEl.innerText = state.deck;
+
     currentTurnPlayerId = state.currentTurnPlayerId;
 
-    document.getElementById('currentTurnName').innerText =
-        state.currentTurnPlayerId === socket.id ? "KAMU" : state.currentTurnPlayerName;
+    const currentTurnNameEl = document.getElementById('currentTurnName');
+    if (currentTurnNameEl) {
+        currentTurnNameEl.innerText =
+            state.currentTurnPlayerId === socket.id ? "KAMU" : state.currentTurnPlayerName;
+    }
 
     const kobuBtn = document.getElementById('kobuBtn');
-    if (state.currentTurnPlayerId === socket.id && !isPeekingPhase && !isGameOver) {
-        kobuBtn.classList.remove('hidden');
-    } else {
-        kobuBtn.classList.add('hidden');
+    if (kobuBtn) {
+        if (state.currentTurnPlayerId === socket.id && !isPeekingPhase && !isGameOver) {
+            kobuBtn.classList.remove('hidden');
+        } else {
+            kobuBtn.classList.add('hidden');
+        }
     }
 
     renderOtherPlayers(state.players, state.currentTurnPlayerId);
@@ -301,12 +324,14 @@ function updateBoardState(state) {
     }
 
     const discardDiv = document.getElementById('discardPile');
-    if (state.discardPile.length === 0) {
-        discardDiv.className = 'card empty';
-        discardDiv.innerText = 'Buangan Kosong';
-    } else {
-        const topDiscard = state.discardPile[state.discardPile.length - 1];
-        discardDiv.className = `card ${topDiscard.color}`;
-        discardDiv.innerText = `${topDiscard.value} ${topDiscard.suit}`;
+    if (discardDiv) {
+        if (state.discardPile.length === 0) {
+            discardDiv.className = 'card empty';
+            discardDiv.innerText = 'Buangan Kosong';
+        } else {
+            const topDiscard = state.discardPile[state.discardPile.length - 1];
+            discardDiv.className = `card ${topDiscard.color}`;
+            discardDiv.innerText = `${topDiscard.value} ${topDiscard.suit}`;
+        }
     }
 }
