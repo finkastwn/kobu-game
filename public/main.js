@@ -288,3 +288,53 @@ function updateBoardState(state) {
         discardDiv.innerText = `${topDiscard.value} ${topDiscard.suit}`;
     }
 }
+
+let hasJoined = false;
+
+function joinGame() {
+    if (hasJoined) return;
+    const nameInput = document.getElementById('playerName');
+    const name = nameInput.value.trim();
+    if (name) {
+        socket.emit('joinRoom', name);
+    }
+}
+
+// Respon jika berhasil masuk room
+socket.on('joinSuccess', ({ name }) => {
+    hasJoined = true;
+    const joinBtn = document.querySelector('.lobby-buttons .btn-primary');
+    if (joinBtn) {
+        joinBtn.disabled = true;
+        joinBtn.innerText = "Sudah Masuk";
+        joinBtn.style.opacity = "0.6";
+        joinBtn.style.cursor = "not-allowed";
+    }
+    const nameInput = document.getElementById('playerName');
+    if (nameInput) nameInput.disabled = true;
+});
+
+// Respon jika gagal masuk room (misal duplicate name/room penuh)
+socket.on('joinError', (msg) => {
+    alert(msg);
+});
+
+// REAL-TIME UPDATE UNTUK LOBBY MAUPUN MEJA GAME
+socket.on('updateRoom', (state) => {
+    // 1. Update daftar pemain di lobby
+    const list = document.getElementById('playerList');
+    if (list && state.players) {
+        list.innerHTML = state.players.map(p => `<li>${p.name}</li>`).join('');
+    }
+
+    // 2. Update counter pemain di lobby (X/6)
+    const countEl = document.getElementById('playerCount');
+    if (countEl && state.players) {
+        countEl.innerText = state.players.length;
+    }
+
+    // 3. Update tampilan pemain di meja game secara real-time
+    if (state.gameStarted) {
+        updateBoardState(state);
+    }
+});
