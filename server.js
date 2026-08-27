@@ -245,8 +245,7 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'production') {
-    server.listen(PORT, () => console.log(`Server Kobu di http://localhost:${PORT}`));
-}
 
-module.exports = app;
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server Kobu berhasil berjalan di port ${PORT}`);
+});
