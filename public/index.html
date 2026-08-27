@@ -12,7 +12,7 @@
 <body>
     <div id="lobby">
         <h1 class="logo">KOBU</h1>
-        <p class="subtitle">KOmpatibel BUat Anak Sholeh</p>
+        <p class="subtitle">Kartu Orang Ber-Ukhuwah</p>
         <div class="lobby-box">
             <input type="text" id="playerName" placeholder="Masukkan Nama Kamu..." autocomplete="off">
             <div class="lobby-buttons">
@@ -25,7 +25,6 @@
     </div>
 
     <div id="gameBoard" class="hidden">
-        <!-- Top Status Bar -->
         <div class="top-bar">
             <div id="timerNotice" class="badge badge-warning">
                 ⏱️ Fase Intip Kartu: <strong id="countdownSec">10</strong>s
@@ -35,32 +34,30 @@
             </div>
         </div>
 
-        <!-- Banner Papan Skor Game Over (Tidak Memblokir Kartu) -->
         <div id="gameOverModal" class="score-banner hidden">
-            <h2 id="kobuCallerText">KOBU!</h2>
+            <h2 id="kobuCallerText">KOBU Dipanggil!</h2>
             <div id="scoreBoard"></div>
             <button onclick="location.reload()" class="btn btn-primary" style="margin-top:10px;">Main Lagi</button>
         </div>
 
-        <!-- Zone 1: Pemain Lain -->
         <div id="otherPlayers"></div>
 
-        <!-- Zone 2: Area Meja Tengah (Dek & Buangan) -->
         <div class="table-center">
             <div class="deck-container">
                 <div id="drawDeck" class="card back" onclick="drawFromDeck()">
+                    <span class="card-label">Cangkulan</span>
                 </div>
                 <small class="deck-count">Sisa: <strong id="deckCount">0</strong></small>
             </div>
 
             <div class="deck-container">
                 <div id="discardPile" class="card empty" onclick="drawFromDiscard()">
+                    Buangan Kosong
                 </div>
-                <small class="deck-count"></small>
+                <small class="deck-count">Tumpukan Buangan</small>
             </div>
         </div>
 
-        <!-- Zone 3: Kartu yang Baru Diambil -->
         <div id="heldCardArea" class="held-zone hidden">
             <h4>Kartu yang Diambil:</h4>
             <div class="held-card-wrapper">
@@ -70,10 +67,9 @@
             <p class="hint">Klik kartu di bawah untuk <strong>MENUKAR</strong>, atau tombol di atas untuk membuang.</p>
         </div>
 
-        <!-- Zone 4: Kartu Milik Sendiri & Tombol Kobu Bawah -->
         <div id="myHandContainer" class="my-zone">
             <div class="my-hand-header">
-                <h3>Kartu Kamu (Terbuka Saat Game Over):</h3>
+                <h3>Kartu Kamu:</h3>
                 <button id="kobuBtn" class="hidden" onclick="callKobu()">⚡ KOBU!</button>
             </div>
             <div id="myHand" class="hand-grid"></div>

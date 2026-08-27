@@ -19,7 +19,6 @@ body {
     display: none !important;
 }
 
-/* === LOBBY SYSTEM === */
 #lobby {
     width: 100%;
     max-width: 420px;
@@ -81,7 +80,6 @@ input[type="text"] {
     font-weight: 500;
 }
 
-/* === BUTTONS & BADGES === */
 .btn {
     padding: 10px 18px;
     border-radius: 8px;
@@ -142,7 +140,6 @@ input[type="text"] {
     font-weight: 900;
 }
 
-/* === GAME BOARD & PLAYERS AREA === */
 #gameBoard {
     width: 100%;
     max-width: 800px;
@@ -181,7 +178,6 @@ input[type="text"] {
     margin-bottom: 6px;
 }
 
-/* === VISUAL MEJA & KARTU === */
 .table-center {
     display: flex;
     gap: 40px;
@@ -264,7 +260,6 @@ input[type="text"] {
     justify-content: center;
 }
 
-/* === ZONA HELD CARD (HASIL CANGKUL) === */
 .held-zone {
     background: rgba(0, 0, 0, 0.4);
     padding: 15px 25px;
@@ -287,7 +282,6 @@ input[type="text"] {
     color: #d8f3dc;
 }
 
-/* === ZONA KARTU SENDIRI & TOMBOL KOBU === */
 .my-zone {
     margin-top: 15px;
     text-align: center;
@@ -344,7 +338,6 @@ input[type="text"] {
     gap: 12px;
 }
 
-/* === MODAL SKOR & GAME OVER === */
 .score-banner {
     width: 100%;
     max-width: 600px;

@@ -62,7 +62,6 @@ function getSanitizedState() {
             id: p.id,
             name: p.name,
             handCount: p.hand.length,
-            // Jika Game Over, kirim data kartu terbuka ke semua orang
             hand: roomState.gameOver ? p.hand : null,
             hasPeeked: p.hasPeeked,
             hasHeldCard: !!p.heldCard
@@ -80,24 +79,21 @@ function nextTurn() {
 
 io.on('connection', (socket) => {
     socket.on('joinRoom', (playerName) => {
-        const cleanName = playerName.trim();
+        const cleanName = playerName ? playerName.trim() : '';
         if (!cleanName) return;
 
-        // Prevent Duplicate 1: Cek apakah socket ID ini sudah masuk room
         const existingPlayerBySocket = roomState.players.find(p => p.id === socket.id);
         if (existingPlayerBySocket) {
             socket.emit('joinError', 'Kamu sudah bergabung dalam room!');
             return;
         }
 
-        // Prevent Duplicate 2: Cek apakah nama sudah dipakai pemain lain
         const existingPlayerByName = roomState.players.find(p => p.name.toLowerCase() === cleanName.toLowerCase());
         if (existingPlayerByName) {
             socket.emit('joinError', 'Nama tersebut sudah digunakan pemain lain di room ini!');
             return;
         }
 
-        // Batas maksimal 6 pemain & game belum mulai
         if (roomState.players.length < 6 && !roomState.gameStarted) {
             roomState.players.push({
                 id: socket.id,
@@ -107,10 +103,7 @@ io.on('connection', (socket) => {
                 heldCard: null
             });
 
-            // Beritahu pemain yang baru bergabung bahwa ia sukses masuk
             socket.emit('joinSuccess', { name: cleanName });
-
-            // KIRIM UPDATE SECARA REAL-TIME KE SEMUA ORANG DI ROOM
             io.emit('updateRoom', getSanitizedState());
         } else if (roomState.gameStarted) {
             socket.emit('joinError', 'Permainan sudah dimulai, tidak bisa bergabung lagi!');
@@ -266,13 +259,11 @@ io.on('connection', (socket) => {
         if (roomState.players.length < 2) {
             roomState.gameStarted = false;
         }
-        // Kirim update real-time jika ada pemain yang terputus/keluar
         io.emit('updateRoom', getSanitizedState());
     });
 });
 
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server Kobu berhasil berjalan di port ${PORT}`);
+    console.log(`Server Kobu berjalan di port ${PORT}`);
 });
